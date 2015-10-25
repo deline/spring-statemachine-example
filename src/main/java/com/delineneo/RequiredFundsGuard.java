@@ -10,6 +10,7 @@ import java.math.BigDecimal;
  */
 
 
+
 public class RequiredFundsGuard implements Guard<States, Events> {
 
     public RequiredFundsGuard() {
@@ -17,7 +18,11 @@ public class RequiredFundsGuard implements Guard<States, Events> {
     }
 
     public boolean evaluate(StateContext context) {
-        BigDecimal amountEntered = context.getExtendedState().get("amountEntered", BigDecimal.class);
-        return amountEntered.compareTo(BigDecimal.valueOf(2)) >= 0;
+//        BigDecimal amountEntered = context.getExtendedState().get("amountEntered", BigDecimal.class);
+//        return amountEntered.compareTo(BigDecimal.valueOf(2)) >= 0;
+
+        System.out.println("************* ARGH");
+
+        return false;
     }
 }

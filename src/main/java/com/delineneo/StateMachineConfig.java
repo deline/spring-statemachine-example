@@ -2,13 +2,13 @@ package com.delineneo;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
-import org.springframework.statemachine.config.configurers.ExternalTransitionConfigurer;
-import org.springframework.statemachine.event.LoggingListener;
+import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.listener.StateMachineListener;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
@@ -18,7 +18,7 @@ import java.util.EnumSet;
 import static com.delineneo.Events.COIN_ENTERED;
 import static com.delineneo.Events.START_BUTTON_PUSHED;
 import static com.delineneo.States.AWAITING_MACHINE_START;
-import static com.delineneo.States.COIN_ENTRY_STATE;
+import static com.delineneo.States.AWAITING_COIN;
 import static com.delineneo.States.MACHINE_STARTED;
 
 /**
@@ -32,7 +32,7 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
     public void configure(StateMachineConfigurationConfigurer<States, Events> config) throws Exception {
         config
                 .withConfiguration()
-//                .autoStartup(true)
+                .autoStartup(true)
                 .listener(listener());
     }
 
@@ -40,7 +40,8 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
     public void configure(StateMachineStateConfigurer<States, Events> states) throws Exception {
         states
             .withStates()
-                .initial(COIN_ENTRY_STATE)
+                .initial(AWAITING_COIN)
+                .choice(States.COIN_ENTERED)
                 .states(EnumSet.allOf(States.class));
     }
 
@@ -48,10 +49,11 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
     public void configure(StateMachineTransitionConfigurer<States, Events> transitions) throws Exception {
         transitions
                 .withExternal()
-                    .source(COIN_ENTRY_STATE).target(AWAITING_MACHINE_START).event(COIN_ENTERED).and()
+                    .source(AWAITING_COIN).target(States.COIN_ENTERED).event(COIN_ENTERED).and()
+                .withChoice()
+                    .source(States.COIN_ENTERED).first(AWAITING_COIN, new RequiredFundsGuard()).last(AWAITING_MACHINE_START).and()
                 .withExternal()
                     .source(AWAITING_MACHINE_START).target(MACHINE_STARTED).event(START_BUTTON_PUSHED);
-
     }
 
     @Bean

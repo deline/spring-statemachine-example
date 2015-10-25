@@ -13,26 +13,6 @@ import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
  */
 public class StateMachineTest extends AbstractStateMachineTests {
 
-//    @SuppressWarnings("unchecked")
-//    @Test
-//    public void notEnoughFundsRemainsInCoinEntryState() throws Exception {
-//        registerAndRefresh(StateMachineConfig.class);
-//
-//        StateMachine<States, Events> statemachine = context.getBean(StateMachine.class);
-//        StateMachineTestPlan<States, Events> plan =StateMachineTestPlanBuilder.<States, Events>builder()
-//                .stateMachine(statemachine)
-//                .step()
-//                    .expectState(States.COIN_ENTRY_STATE)
-//                    .and()
-//                .step()
-//                    .sendEvent(Events.COIN_ENTERED)
-//                    .expectState(States.COIN_ENTRY_STATE)
-//                    .and()
-//                .build();
-//
-//        plan.test();
-//    }
-
     @SuppressWarnings("unchecked")
     @Test
     public void whenEnoughFundsAreEnteredStateTransitionsToAwaitingMachineStartState() throws Exception {
@@ -43,6 +23,26 @@ public class StateMachineTest extends AbstractStateMachineTests {
                 .step()
                     .sendEvent(Events.COIN_ENTERED)
                     .expectState(States.AWAITING_MACHINE_START)
+                    .and()
+                .build();
+
+        plan.test();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void notEnoughFundsRemainsInCoinEntryState() throws Exception {
+        registerAndRefresh(StateMachineConfig.class);
+
+        StateMachine<States, Events> statemachine = context.getBean(StateMachine.class);
+        StateMachineTestPlan<States, Events> plan =StateMachineTestPlanBuilder.<States, Events>builder()
+                .stateMachine(statemachine)
+                .step()
+                    .expectState(States.AWAITING_COIN)
+                    .and()
+                .step()
+                    .sendEvent(Events.COIN_ENTERED)
+                    .expectState(States.AWAITING_COIN)
                     .and()
                 .build();
 
