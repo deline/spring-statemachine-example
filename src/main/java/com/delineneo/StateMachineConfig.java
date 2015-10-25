@@ -13,9 +13,12 @@ import org.springframework.statemachine.state.State;
 
 import java.util.EnumSet;
 
+import static com.delineneo.States.AWAITING_MACHINE_START;
+import static com.delineneo.States.COIN_ENTRY_STATE;
+
 /**
  * Created by deline on 23/10/2015.
- */ 
+ */
 @Configuration
 @EnableStateMachine
 public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States, Events> {
@@ -33,8 +36,10 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
     public void configure(StateMachineStateConfigurer<States, Events> states)
             throws Exception {
         states
-                .withStates()
-                .initial(States.S1)
+            .withStates()
+                .initial(COIN_ENTRY_STATE)
+                .choice(COIN_ENTRY_STATE)
+                .end(States.MACHINE_STARTED)
                 .states(EnumSet.allOf(States.class));
     }
 
@@ -42,11 +47,10 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
     public void configure(StateMachineTransitionConfigurer<States, Events> transitions)
             throws Exception {
         transitions
-                .withExternal()
-                .source(States.S1).target(States.S1).event(Events.E1)
-                .and()
-                .withExternal()
-                .source(States.S1).target(States.S2).event(Events.E2);
+            .withChoice()
+                .source(COIN_ENTRY_STATE)
+                .first(AWAITING_MACHINE_START, new RequiredFundsGuard())
+                .last(COIN_ENTRY_STATE);
     }
 
     @Bean
@@ -54,7 +58,8 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
         return new StateMachineListenerAdapter<States, Events>() {
             @Override
             public void stateChanged(State<States, Events> from, State<States, Events> to) {
-                System.out.println("State change to " + to.getId());
+                String outputString = String.format("State change from: %s to: %s", from.getId(), to.getId());
+                System.out.println(outputString);
             }
         };
     }
