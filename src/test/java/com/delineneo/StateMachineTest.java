@@ -3,10 +3,18 @@ package com.delineneo;
 
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.test.AbstractStateMachineTests;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
+
+import java.math.BigDecimal;
+
+import static com.delineneo.Events.COIN_ENTERED;
+import static com.delineneo.States.AWAITING_COIN;
+import static com.delineneo.States.AWAITING_MACHINE_START;
 
 /**
  * Created by deline on 25/10/2015.
@@ -17,13 +25,32 @@ public class StateMachineTest extends AbstractStateMachineTests {
     @Test
     public void whenEnoughFundsAreEnteredStateTransitionsToAwaitingMachineStartState() throws Exception {
         registerAndRefresh(StateMachineConfig.class);
+
+        Message<Events> oneDollarEntered = MessageBuilder
+                .withPayload(COIN_ENTERED)
+                .setHeader("coinEntered", new BigDecimal(1.00))
+                .build();
+
+        Message<Events> fiftyCentsEntered = MessageBuilder
+                .withPayload(COIN_ENTERED)
+                .setHeader("coinEntered", new BigDecimal(0.5))
+                .build();
+
         StateMachine<States, Events> statemachine = context.getBean(StateMachine.class);
         StateMachineTestPlan<States, Events> plan =StateMachineTestPlanBuilder.<States, Events>builder()
                 .stateMachine(statemachine)
                 .step()
-                    .sendEvent(Events.COIN_ENTERED)
-                    .expectState(States.AWAITING_MACHINE_START)
+                    .sendEvent(oneDollarEntered)
+                    .expectState(AWAITING_COIN)
                     .and()
+                .step()
+                    .sendEvent(fiftyCentsEntered)
+                    .expectState(AWAITING_COIN)
+                    .and()
+                .step()
+                    .sendEvent(fiftyCentsEntered)
+                    .expectState(AWAITING_MACHINE_START)
+                .and()
                 .build();
 
         plan.test();
@@ -34,15 +61,28 @@ public class StateMachineTest extends AbstractStateMachineTests {
     public void notEnoughFundsRemainsInCoinEntryState() throws Exception {
         registerAndRefresh(StateMachineConfig.class);
 
+        Message<Events> fiftyCentsEntered = MessageBuilder
+                .withPayload(COIN_ENTERED)
+                .setHeader("coinEntered", new BigDecimal(0.5))
+                .build();
+
         StateMachine<States, Events> statemachine = context.getBean(StateMachine.class);
         StateMachineTestPlan<States, Events> plan =StateMachineTestPlanBuilder.<States, Events>builder()
                 .stateMachine(statemachine)
                 .step()
-                    .expectState(States.AWAITING_COIN)
+                    .expectState(AWAITING_COIN)
                     .and()
                 .step()
-                    .sendEvent(Events.COIN_ENTERED)
-                    .expectState(States.AWAITING_COIN)
+                    .sendEvent(fiftyCentsEntered)
+                    .expectState(AWAITING_COIN)
+                    .and()
+                .step()
+                    .sendEvent(fiftyCentsEntered)
+                    .expectState(AWAITING_COIN)
+                    .and()
+                .step()
+                    .sendEvent(fiftyCentsEntered)
+                    .expectState(AWAITING_COIN)
                     .and()
                 .build();
 
@@ -53,13 +93,21 @@ public class StateMachineTest extends AbstractStateMachineTests {
     @Test
     public void whenStateIsAwaitingMachineStartTheStartButtonPushedEventTransitionsToMachineStartedState() throws Exception {
         registerAndRefresh(StateMachineConfig.class);
+
+        Message<Events> twoDollarsEntered = MessageBuilder
+                .withPayload(COIN_ENTERED)
+                .setHeader("coinEntered", new BigDecimal(2.00))
+                .build();
+
         StateMachine<States, Events> statemachine = context.getBean(StateMachine.class);
         StateMachineTestPlan<States, Events> plan =StateMachineTestPlanBuilder.<States, Events>builder()
                 .stateMachine(statemachine)
-                .step().expectStateMachineStarted(1).and()
                 .step()
-                    .sendEvent(Events.COIN_ENTERED)
-                    .expectState(States.AWAITING_MACHINE_START)
+                    .expectState(AWAITING_COIN)
+                    .and()
+                .step()
+                    .sendEvent(twoDollarsEntered)
+                    .expectState(AWAITING_MACHINE_START)
                     .and()
                 .step()
                 .sendEvent(Events.START_BUTTON_PUSHED)

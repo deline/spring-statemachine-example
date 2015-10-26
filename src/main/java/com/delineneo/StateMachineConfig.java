@@ -49,11 +49,20 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
     public void configure(StateMachineTransitionConfigurer<States, Events> transitions) throws Exception {
         transitions
                 .withExternal()
-                    .source(AWAITING_COIN).target(States.COIN_ENTERED).event(COIN_ENTERED).and()
+                    .source(AWAITING_COIN)
+                    .target(States.COIN_ENTERED)
+                    .event(COIN_ENTERED)
+                    .action(new CoinEnteredAction())
+                    .and()
                 .withChoice()
-                    .source(States.COIN_ENTERED).first(AWAITING_COIN, new RequiredFundsGuard()).last(AWAITING_MACHINE_START).and()
+                    .source(States.COIN_ENTERED)
+                    .first(AWAITING_COIN, new RequiredFundsGuard())
+                    .last(AWAITING_MACHINE_START)
+                    .and()
                 .withExternal()
-                    .source(AWAITING_MACHINE_START).target(MACHINE_STARTED).event(START_BUTTON_PUSHED);
+                    .source(AWAITING_MACHINE_START)
+                    .target(MACHINE_STARTED)
+                    .event(START_BUTTON_PUSHED);
     }
 
     @Bean

@@ -13,16 +13,8 @@ import java.math.BigDecimal;
 
 public class RequiredFundsGuard implements Guard<States, Events> {
 
-    public RequiredFundsGuard() {
-        System.out.println("**** constructor");
-    }
-
     public boolean evaluate(StateContext context) {
-//        BigDecimal amountEntered = context.getExtendedState().get("amountEntered", BigDecimal.class);
-//        return amountEntered.compareTo(BigDecimal.valueOf(2)) >= 0;
-
-        System.out.println("************* ARGH");
-
-        return false;
+        BigDecimal amountEntered = context.getExtendedState().get("amountEntered", BigDecimal.class);
+        return amountEntered.compareTo(BigDecimal.valueOf(2)) < 0;
     }
 }
