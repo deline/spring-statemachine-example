@@ -2,13 +2,11 @@ package com.delineneo;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
-import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.listener.StateMachineListener;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
@@ -17,9 +15,7 @@ import java.util.EnumSet;
 
 import static com.delineneo.Events.COIN_ENTERED;
 import static com.delineneo.Events.START_BUTTON_PUSHED;
-import static com.delineneo.States.AWAITING_MACHINE_START;
-import static com.delineneo.States.AWAITING_COIN;
-import static com.delineneo.States.MACHINE_STARTED;
+import static com.delineneo.States.*;
 
 /**
  * Created by deline on 23/10/2015.
@@ -31,9 +27,9 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
     @Override
     public void configure(StateMachineConfigurationConfigurer<States, Events> config) throws Exception {
         config
-                .withConfiguration()
-                .autoStartup(true)
-                .listener(listener());
+            .withConfiguration()
+            .autoStartup(true)
+            .listener(listener());
     }
 
     @Override
@@ -48,21 +44,21 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
     @Override
     public void configure(StateMachineTransitionConfigurer<States, Events> transitions) throws Exception {
         transitions
-                .withExternal()
-                    .source(AWAITING_COIN)
-                    .target(States.COIN_ENTERED)
-                    .event(COIN_ENTERED)
-                    .action(new CoinEnteredAction())
-                    .and()
-                .withChoice()
-                    .source(States.COIN_ENTERED)
-                    .first(AWAITING_COIN, new RequiredFundsGuard())
-                    .last(AWAITING_MACHINE_START)
-                    .and()
-                .withExternal()
-                    .source(AWAITING_MACHINE_START)
-                    .target(MACHINE_STARTED)
-                    .event(START_BUTTON_PUSHED);
+            .withExternal()
+                .source(AWAITING_COIN)
+                .target(States.COIN_ENTERED)
+                .event(COIN_ENTERED)
+                .action(new CoinEnteredAction())
+                .and()
+            .withChoice()
+                .source(States.COIN_ENTERED)
+                .first(AWAITING_COIN, new RequiredFundsGuard())
+                .last(AWAITING_MACHINE_START)
+                .and()
+            .withExternal()
+                .source(AWAITING_MACHINE_START)
+                .target(MACHINE_STARTED)
+                .event(START_BUTTON_PUSHED);
     }
 
     @Bean
