@@ -17,15 +17,17 @@ archivesBaseName = 'gs-statemachine'
 
 repositories {
     mavenCentral()
-    maven { url "http://repo.spring.io/libs-release" }
-    maven { url "http://repo.spring.io/libs-milestone" }
-    maven { url "http://repo.spring.io/libs-snapshot" }
+
 }
 
 dependencies {
-    compile("org.springframework.statemachine:spring-statemachine-core:1.0.0.BUILD-SNAPSHOT")
-    compile("org.springframework.boot:spring-boot-starter:1.2.5.RELEASE")
-    testCompile("org.springframework.statemachine:spring-statemachine-test:1.0.0.BUILD-SNAPSHOT")
+    compile("org.springframework.statemachine:spring-statemachine-core:1.0.0.RELEASE")
+    compile("org.springframework.boot:spring-boot-starter-web:1.2.7.RELEASE")
+    compile('com.fasterxml.jackson.core:jackson-databind:2.6.3')
+    compile('com.fasterxml.jackson.core:jackson-core:2.6.3')
+    compile('org.apache.commons:commons-lang3:3.4')
+
+    testCompile("org.springframework.statemachine:spring-statemachine-test:1.0.0.RELEASE")
     testCompile("junit:junit:4.12")
 }
 

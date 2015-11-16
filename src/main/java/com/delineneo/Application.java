@@ -1,24 +1,15 @@
 package com.delineneo;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.statemachine.StateMachine;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 @SpringBootApplication
-public class Application implements CommandLineRunner {
-    @Autowired
-    private StateMachine<States, Events> stateMachine;
+public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
-    }
-
-    public void run(String... args) throws Exception {
-        stateMachine.sendEvent(Events.COIN_ENTERED);
-//        stateMachine.sendEvent(Events.START_BUTTON_PUSHED);
     }
 }
