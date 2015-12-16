@@ -20,6 +20,10 @@ public class CoinEnteredEvent {
         this.coinValue = coinValue;
     }
 
+    public BigDecimal getCoinValue() {
+        return coinValue;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

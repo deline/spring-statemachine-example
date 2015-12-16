@@ -4,6 +4,7 @@ package com.delineneo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,21 +26,18 @@ public class CoinEntryServiceController {
     @RequestMapping(value = "/coinEntered", method = RequestMethod.PUT)
     public CoinEnteredResponse coinEntered(@RequestBody CoinEnteredEvent coinEnteredEvent) {
 
-        System.out.println("************ coinEnteredEvent = " + coinEnteredEvent);
 
         Message<Events> event = MessageBuilder
                 .withPayload(Events.COIN_ENTERED)
-                .setHeader("coinEntered", new BigDecimal(0))
+                .setHeader("coinEntered", coinEnteredEvent.getCoinValue())
                 .build();
 
-        boolean eventAccepted = stateMachine.sendEvent(event);
-        if (eventAccepted) {
+        boolean eventAccepted = stateMachine.sendEvent(event);  
 
-        } else {
+        ExtendedState extendedState = stateMachine.getExtendedState();
+        BigDecimal amountEntered = (BigDecimal) extendedState.getVariables().get("amountEntered");
+        boolean enoughFundsEntered = amountEntered.compareTo(BigDecimal.valueOf(2)) >= 0;
 
-        }
-
-        return new CoinEnteredResponse(new BigDecimal(1.0), false);
+        return new CoinEnteredResponse(amountEntered, enoughFundsEntered);
     }
-
 }
