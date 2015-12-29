@@ -23,6 +23,8 @@ public class CoinEntryServiceController {
     @Autowired
     private StateMachine<States, Events> stateMachine;
 
+    private RequiredAmountChecker requiredAmountChecker = new RequiredAmountChecker();
+
     @RequestMapping(value = "/coinEntered", method = RequestMethod.PUT)
     public CoinEnteredResponse coinEntered(@RequestBody CoinEnteredEvent coinEnteredEvent) {
 
@@ -32,12 +34,14 @@ public class CoinEntryServiceController {
                 .setHeader("coinEntered", coinEnteredEvent.getCoinValue())
                 .build();
 
-        boolean eventAccepted = stateMachine.sendEvent(event);  
+        boolean eventAccepted = stateMachine.sendEvent(event);
 
         ExtendedState extendedState = stateMachine.getExtendedState();
         BigDecimal amountEntered = (BigDecimal) extendedState.getVariables().get("amountEntered");
-        boolean enoughFundsEntered = amountEntered.compareTo(BigDecimal.valueOf(2)) >= 0;
 
-        return new CoinEnteredResponse(amountEntered, enoughFundsEntered);
+        boolean enoughFundsEntered = requiredAmountChecker.requiredAmountEntered(amountEntered);
+        BigDecimal amountOutstanding = requiredAmountChecker.requiredAmountRemaining(amountEntered)
+;
+        return new CoinEnteredResponse(amountEntered, amountOutstanding, enoughFundsEntered);
     }
 }

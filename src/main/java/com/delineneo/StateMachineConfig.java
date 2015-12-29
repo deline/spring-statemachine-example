@@ -52,8 +52,8 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
                 .and()
             .withChoice()
                 .source(States.COIN_ENTERED)
-                .first(AWAITING_COIN, new RequiredFundsGuard())
-                .last(AWAITING_MACHINE_START)
+                .first(AWAITING_MACHINE_START, new RequiredAmountGuard())
+                .last(AWAITING_COIN)
                 .and()
             .withExternal()
                 .source(AWAITING_MACHINE_START)
@@ -74,5 +74,4 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
             }
         };
     }
-
 }

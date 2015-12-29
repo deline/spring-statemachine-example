@@ -14,14 +14,19 @@ public class CoinEnteredResponse {
     @JsonProperty
     private BigDecimal amountEnteredSoFar;
 
+    @JsonSerialize(using = MoneySerializer.class)
+    @JsonProperty
+    private BigDecimal amountOutstanding;
+
     @JsonProperty
     private boolean enoughFundsEntered;
 
     private CoinEnteredResponse() {
     }
 
-    public CoinEnteredResponse(BigDecimal amountEnteredSoFar, boolean enoughFundsEntered) {
+    public CoinEnteredResponse(BigDecimal amountEnteredSoFar, BigDecimal amountOutstanding, boolean enoughFundsEntered) {
         this.amountEnteredSoFar = amountEnteredSoFar;
+        this.amountOutstanding = amountOutstanding;
         this.enoughFundsEntered = enoughFundsEntered;
     }
 
