@@ -1,5 +1,6 @@
 package com.delineneo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.guard.Guard;
 
@@ -11,7 +12,10 @@ import java.math.BigDecimal;
 
 
 
-public class RequiredFundsGuard implements Guard<States, Events> {
+public class RequiredAmountGuard implements Guard<States, Events> {
+
+    @Autowired
+    private RequiredAmountChecker requiredAmountChecker;
 
     public boolean evaluate(StateContext context) {
         BigDecimal amountEntered = context.getExtendedState().get("amountEntered", BigDecimal.class);
