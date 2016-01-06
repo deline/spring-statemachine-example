@@ -46,8 +46,8 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
         transitions
             .withExternal()
                 .source(AWAITING_COIN)
-                .target(States.COIN_ENTERED)
                 .event(COIN_ENTERED)
+                .target(States.COIN_ENTERED)
                 .action(new CoinEnteredAction())
                 .and()
             .withChoice()
@@ -57,8 +57,8 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
                 .and()
             .withExternal()
                 .source(AWAITING_MACHINE_START)
-                .target(MACHINE_STARTED)
-                .event(START_BUTTON_PUSHED);
+                .event(START_BUTTON_PUSHED)
+                .target(MACHINE_STARTED);
     }
 
     @Bean
